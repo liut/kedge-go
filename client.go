@@ -37,7 +37,7 @@ type clientImpl struct {
 // New return a client instance with args: [root[, uri]]
 func New(args ...string) ClientI {
 	root := "."
-	uri := "http://localhost:16180"
+	uri := "http://localhost:16180/api"
 	if s, ok := os.LookupEnv("KC_KEDGE_URI"); ok && len(s) > 0 {
 		uri = s
 	}
@@ -76,20 +76,20 @@ func (c *clientImpl) Add(rd io.Reader, hat string) (err error) {
 }
 
 func (c *clientImpl) Drop(hash string) (err error) {
-	uri := c.uri + "/" + hash
+	uri := c.uri + "/torrent/" + hash
 	err = doRequest(c.rc.R().Delete, uri)
 	return
 }
 
 func (c *clientImpl) DropWithData(hash string) (err error) {
-	uri := c.uri + "/" + hash + "/with_data"
+	uri := c.uri + "/torrent/" + hash + "/with_data"
 	err = doRequest(c.rc.R().Delete, uri)
 	return
 }
 
 // Exist check a hash exist
 func (c *clientImpl) Exist(hash string) bool {
-	uri := c.uri + "/" + hash
+	uri := c.uri + "/torrent/" + hash
 	err := doRequest(c.rc.R().Head, uri)
 	return err == nil
 }
@@ -119,14 +119,14 @@ func (c *clientImpl) GetTorrent(hash string) (*TorrentStatus, error) {
 }
 
 func (c *clientImpl) Session() (res *TeSession, err error) {
-	uri := c.uri + "/sess"
+	uri := c.uri + "/session/info"
 	res = new(TeSession)
 	err = doRequest(c.rc.R().SetResult(res).Get, uri)
 	return
 }
 
 func (c *clientImpl) Stats() (res *TeStatistics, err error) {
-	uri := c.uri + "/stats"
+	uri := c.uri + "/session/stats"
 	res = new(TeStatistics)
 	err = doRequest(c.rc.R().SetResult(res).Get, uri)
 	return
